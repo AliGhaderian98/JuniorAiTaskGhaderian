@@ -19,3 +19,10 @@ COLLECTION_NAME = "cdm_chunks"
 # Retrieval (values chosen from measurements, see docs/IMPLEMENTATION_PLAN.md §9).
 RETRIEVAL_TOP_K = int(os.getenv("RETRIEVAL_TOP_K", "5"))
 RETRIEVAL_MIN_SCORE = float(os.getenv("RETRIEVAL_MIN_SCORE", "0.63"))
+
+# Answer generation. gpt-4.1-mini was compared with gpt-5.4-mini on the demo
+# questions: both stayed grounded, but gpt-5.4-mini refused to list Account
+# attributes that were present in the context.
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
+OPENAI_TIMEOUT_SECONDS = 60
