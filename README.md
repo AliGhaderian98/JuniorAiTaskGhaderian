@@ -93,6 +93,13 @@ Assumptions and observations:
 
 Requires Python 3.12.
 
+On **Windows**, some CDM file paths are long. If `git clone` fails with
+`Filename too long`, clone with long paths enabled (or into a short folder):
+
+```bash
+git clone -c core.longpaths=true https://github.com/AliGhaderian98/JuniorAiTaskGhaderian.git
+```
+
 ```bash
 python -m venv .venv
 # Windows: .venv\Scripts\activate    Linux/macOS: source .venv/bin/activate

@@ -5,7 +5,13 @@ import openai
 import pytest
 
 from app.documents import Chunk
-from app.rag_service import NO_CONTEXT_ANSWER, SYSTEM_PROMPT, LLMUnavailableError, RagService, build_context
+from app.rag_service import (
+    NO_CONTEXT_ANSWER,
+    SYSTEM_PROMPT,
+    LLMUnavailableError,
+    RagService,
+    build_context,
+)
 from app.retriever import RetrievedChunk
 
 

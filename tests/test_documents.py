@@ -1,4 +1,9 @@
-from app.documents import ATTRIBUTES_PER_CHUNK, build_attribute_chunks, build_chunks, build_overview_chunk
+from app.documents import (
+    ATTRIBUTES_PER_CHUNK,
+    build_attribute_chunks,
+    build_chunks,
+    build_overview_chunk,
+)
 from app.models import Attribute, Entity, Relationship
 
 

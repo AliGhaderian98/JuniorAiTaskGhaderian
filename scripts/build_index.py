@@ -11,12 +11,12 @@ import chromadb
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from app import config  # noqa: E402
-from app.cdm_loader import download_cdm_files  # noqa: E402
-from app.cdm_parser import load_cdm_entities  # noqa: E402
-from app.documents import build_chunks  # noqa: E402
-from app.embeddings import Embedder  # noqa: E402
-from app.vector_store import add_chunks, get_collection  # noqa: E402
+from app import config
+from app.cdm_loader import download_cdm_files
+from app.cdm_parser import load_cdm_entities
+from app.documents import build_chunks
+from app.embeddings import Embedder
+from app.vector_store import add_chunks, get_collection
 
 
 def main() -> None:

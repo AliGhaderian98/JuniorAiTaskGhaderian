@@ -3,7 +3,12 @@ from pathlib import Path
 
 import pytest
 
-from app.cdm_parser import load_entities, load_entity, parse_attribute, parse_manifest_relationships
+from app.cdm_parser import (
+    load_entities,
+    load_entity,
+    parse_attribute,
+    parse_manifest_relationships,
+)
 
 FIXTURES = Path(__file__).parent / "fixtures" / "cdm"
 MANIFEST = "banking/banking.manifest.cdm.json"

@@ -14,10 +14,10 @@ import chromadb
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from app import config  # noqa: E402
-from app.embeddings import Embedder  # noqa: E402
-from app.retriever import Retriever  # noqa: E402
-from app.vector_store import get_collection  # noqa: E402
+from app import config
+from app.embeddings import Embedder
+from app.retriever import Retriever
+from app.vector_store import get_collection
 
 IN_SCOPE = [
     ("What are the core attributes of the Account entity?", {"Account"}),
