@@ -126,7 +126,7 @@ python scripts/build_index.py
 
 Parses the CDM files, builds 168 chunks, checks that no chunk exceeds the model's 512-token
 limit, embeds them (the model is downloaded on first run, ~130 MB) and rebuilds the
-Chroma collection. Takes about 10 seconds on a laptop CPU after the model download.
+Chroma collection. Measured: 9–35 seconds on a laptop CPU (plus the one-time model download).
 
 ## 8. Run the API
 
@@ -164,7 +164,9 @@ pytest
 python scripts/evaluate_retrieval.py   # optional: checks against the real index
 ```
 
-58 unit tests, about 5 seconds, no network and no OpenAI calls:
+58 tests, 5–8 seconds, no network and no OpenAI calls. Most are unit tests with fakes;
+`test_vector_store.py` and `test_retrieval.py` use an in-memory Chroma, and
+`test_real_cdm_data.py` reads the committed data files:
 
 | File | Covers |
 |---|---|
