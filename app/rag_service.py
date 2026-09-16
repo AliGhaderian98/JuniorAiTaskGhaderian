@@ -98,5 +98,5 @@ class RagService:
                 temperature=0,
             )
         except openai.APIError as error:
-            raise LLMUnavailableError(f"OpenAI request failed: {type(error).__name__}") from error
+            raise LLMUnavailableError(f"OpenAI request failed ({type(error).__name__}).") from error
         return response.output_text
