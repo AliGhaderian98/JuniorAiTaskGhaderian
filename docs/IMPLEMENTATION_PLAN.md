@@ -209,25 +209,41 @@ metadata plus both-side retrieval is enough. A graph DB would help with
 multi-hop path questions ("how is Fi_card connected to Branch through 3
 entities?") at a much larger scale.
 
-## 9. Retrieval strategy
+## 9. Retrieval strategy (implemented in Phase 6, values measured)
 
 ```
 question
-  1. exact entity-name match (case-insensitive, whole word, against known names)
-     -> include matched entities' overview chunks
-  2. embed question -> Chroma top-k (k = 5) by cosine distance
-  3. drop vector hits below a relevance threshold
-  4. merge + deduplicate (exact matches first), cap total chunks (~8)
-  5. if nothing survives -> abstain without calling the LLM
+  1. entity-name match (case-insensitive, plural "s", "financial product" = FinancialProduct,
+     longest name wins) -> overview + referenced_by chunks of up to 3 named entities
+  2. embed question (with BGE query instruction) -> Chroma top_k = 5 (cosine)
+  3. keep vector hits with score >= 0.63
+  4. merge: name matches first, no duplicates
+  5. nothing left -> abstain without calling the LLM
 ```
 
-- `k = 5`: a few entities' chunks fit well within the prompt. It will be tuned
-  on a handful of test questions, and the reasons will be recorded.
-- The threshold is **calibrated empirically** in Phase 6: score in-scope vs.
-  off-topic questions ("What is the capital of France?"), then pick a value
-  between the two groups and document it. No magic number.
-- No reranker and no hybrid BM25. These can be added only if evaluation shows a
-  need.
+Why each step (measurements with the real index):
+- **Name matching.** For "How does a Contact relate to an Account?", pure vector
+  search returned only attribute chunks in the top 5. The overview chunks that
+  list the relationships were missing. Name matching guarantees they are
+  included.
+- **BGE query instruction.** Recommended by the model card. On 12 in-scope and
+  12 off-topic questions it improved expected-entity ranks (Organization 2→1,
+  FinancialProduct 3→2) and lowered the highest off-topic top-1 score from
+  0.658 to 0.610. The lowest in-scope top-1 score was 0.663.
+- **min_score = 0.63.** Sits between those two values. Small sample, so it is a
+  first layer only: near-domain questions that pass it must be caught by the
+  prompt (§10).
+- **top_k = 5.** Enough to include the named entities' most similar attribute
+  chunks, and keeps the context at ≤ ~10 chunks (≈ 3–4k tokens).
+
+`scripts/evaluate_retrieval.py`: **17/18 checks pass.** Known failure: "assets
+pledged to secure a loan" does not retrieve `Collateral` (vocabulary mismatch
+between question and CDM text). Possible fixes, not implemented: hybrid
+BM25+vector search, a reranker, or a larger embedding model.
+
+Known side effect: common English words that are also entity names ("bank",
+"product", "limit", "contact") trigger name matching. That only adds context.
+The prompt still decides whether it answers the question.
 
 ## 10. Grounded generation
 

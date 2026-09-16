@@ -15,3 +15,7 @@ EMBEDDING_MAX_TOKENS = 512
 # Persistent Chroma index, created by scripts/build_index.py.
 CHROMA_DIR = Path(os.getenv("CHROMA_DIR", PROJECT_ROOT / "chroma_db"))
 COLLECTION_NAME = "cdm_chunks"
+
+# Retrieval (values chosen from measurements, see docs/IMPLEMENTATION_PLAN.md §9).
+RETRIEVAL_TOP_K = int(os.getenv("RETRIEVAL_TOP_K", "5"))
+RETRIEVAL_MIN_SCORE = float(os.getenv("RETRIEVAL_MIN_SCORE", "0.63"))
