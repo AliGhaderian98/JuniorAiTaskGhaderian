@@ -1,0 +1,40 @@
+{
+  "imports": [{"corpusPath": "_allImports.cdm.json"}],
+  "definitions": [
+    {"attributeGroupName": "notAnEntity", "members": []},
+    {
+      "entityName": "Account",
+      "extendsEntity": "base_Account/Account",
+      "description": "A company that represents a customer of the bank.",
+      "hasAttributes": [
+        {
+          "attributeGroupReference": {
+            "attributeGroupName": "attributesAddedAtThisScope",
+            "members": [
+              {"name": "name", "dataType": "string", "description": "Banking description of name."},
+              {"name": "annualReviewDate", "dataType": "dateTime", "description": "  Date of the annual review. "},
+              {
+                "name": "accountCategoryCode",
+                "dataType": {"dataTypeReference": "listLookup", "appliedTraits": []}
+              },
+              {"name": "enrollmentBranch", "entity": {"entityReference": "Branch"}},
+              {
+                "name": "parentCustomer",
+                "entity": {
+                  "entityReference": {
+                    "entityName": "Customer",
+                    "hasAttributes": [
+                      {"name": "contactOption", "entity": {"entityReference": "Contact"}},
+                      {"name": "accountOption", "entity": {"entityReference": "Account"}}
+                    ]
+                  }
+                }
+              },
+              "customerIdAttribute"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

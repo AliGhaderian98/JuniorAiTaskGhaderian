@@ -1,0 +1,27 @@
+{
+  "jsonSchemaSemanticVersion": "1.0.0",
+  "imports": [{"corpusPath": "_allImports.cdm.json"}],
+  "definitions": [
+    {
+      "entityName": "Account",
+      "extendsEntity": "CdsStandard",
+      "description": "Base account description.",
+      "hasAttributes": [
+        {
+          "attributeGroupReference": {
+            "attributeGroupName": "attributesAddedAtThisScope",
+            "members": [
+              {"name": "accountId", "dataType": "entityId", "description": "Unique identifier of the account."},
+              {"name": "name", "dataType": "string", "description": "Base description of name."},
+              {
+                "name": "primaryContact",
+                "entity": {"entityReference": "Contact", "appliedTraits": []},
+                "resolutionGuidance": {}
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

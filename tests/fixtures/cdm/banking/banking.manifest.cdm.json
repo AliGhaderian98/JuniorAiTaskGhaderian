@@ -1,0 +1,17 @@
+{
+  "manifestName": "banking",
+  "entities": [
+    {"type": "LocalEntity", "entityName": "Account", "entityPath": "Account.cdm.json/Account"},
+    {"type": "LocalEntity", "entityName": "Branch", "entityPath": "Branch.cdm.json/Branch"}
+  ],
+  "relationships": [
+    {"fromEntity": "Account.cdm.json/Account", "fromEntityAttribute": "enrollmentBranchId",
+     "toEntity": "Branch.cdm.json/Branch", "toEntityAttribute": "branchId"},
+    {"fromEntity": "Account.cdm.json/Account", "fromEntityAttribute": "createdBy",
+     "toEntity": "/core/applicationCommon/User.cdm.json/User", "toEntityAttribute": "systemUserId"},
+    {"fromEntity": "Account.cdm.json/Account", "fromEntityAttribute": "createdBy",
+     "toEntity": "/core/other/User.cdm.json/User", "toEntityAttribute": "systemUserId"},
+    {"fromEntity": "/core/applicationCommon/Email.cdm.json/Email", "fromEntityAttribute": "regardingObjectId",
+     "toEntity": "Account.cdm.json/Account", "toEntityAttribute": "accountId"}
+  ]
+}

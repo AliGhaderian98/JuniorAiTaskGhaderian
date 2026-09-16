@@ -1,0 +1,19 @@
+{
+  "definitions": [
+    {
+      "entityName": "Branch",
+      "extendsEntity": "CdsStandard",
+      "description": "A branch is used to represent the location of a bank branch.",
+      "hasAttributes": [
+        {
+          "attributeGroupReference": {
+            "attributeGroupName": "attributesAddedAtThisScope",
+            "members": [
+              {"name": "branchId", "dataType": "entityId", "description": "Unique identifier of the branch."}
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

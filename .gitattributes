@@ -1,0 +1,3 @@
+# Keep LF line endings (also keeps the CDM data identical to the official files)
+* text=auto eol=lf
+*.pdf binary

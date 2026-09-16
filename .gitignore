@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+
+# Secrets
+.env
+
+# Generated vector index (rebuild with: python scripts/build_index.py)
+chroma_db/
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.xdv
+
+# IDE / OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
