@@ -31,7 +31,7 @@ Every row was actually run; results are copied from the command output.
 | 21 | Docker run + requests inside container | PASS |
 | 22 | Docker without network | PASS |
 | 23 | Secrets / ignored files | PASS |
-| 24 | LaTeX presentation compilation | NOT VERIFIED (source only, static checks PASS) |
+| 24 | LaTeX presentation compilation (3 pages, visually checked) | PASS |
 
 ## Details
 
@@ -165,18 +165,22 @@ Only placeholders (`sk-...`) in the README, a comment in the Dockerfile and
 `git check-ignore`: `.env`, `chroma_db/`, `.venv/` are ignored; none are tracked.
 `.dockerignore` excludes `.env`, `.venv`, `chroma_db`.
 
-### 24. LaTeX presentation — NOT VERIFIED
-`pdflatex`, `xelatex` and `latexmk` are not installed on this machine, and by decision only the
-`.tex` source is delivered. No PDF exists, so page count and overflowing text were **not** checked.
-
-Command to compile (from `docs/`):
+### 24. LaTeX presentation — PASS
+LaTeX is not installed on Windows, so the official TeX Live Docker image was used
+(`texlive/texlive:latest-medium`, pdfTeX 1.40.29, TeX Live 2026). Compiled in a separate
+build folder, twice:
 ```
-pdflatex presentation.tex && pdflatex presentation.tex        # expect 3 pages
+docker run --rm -v <build folder>:/build -w /build texlive/texlive:latest-medium \
+    pdflatex -interaction=nonstopmode -halt-on-error presentation.tex      (run 1: exit 0)
+    ... same command again                                                   (run 2: exit 0)
+Output written on presentation.pdf (3 pages, 145122 bytes).
+grep -cE "Overfull|Underfull|Warning|Missing character" presentation.log  -> 0
 ```
-
-What was checked instead (a script, not a LaTeX run):
-```
-python check_tex.py presentation.tex
-frames: 3 | environments balanced: True | braces balanced: True
-possibly unescaped _ : [] | unescaped & : [] | unescaped # : []
-```
+- Page count: **3** (limit 3).
+- The log shows no warnings, but Beamer does not always warn about layout problems, so all
+  three pages were rendered to PNG and inspected. The first render showed two problems:
+  model names hyphenated inside the diagram boxes on slide 1, and nested bullet points in a
+  larger font on slide 2. Both were fixed (wider boxes, `\mbox` for model names,
+  `itemize/enumerate subbody` font size), recompiled and inspected again: no overlapping or
+  clipped text.
+- Result committed as `docs/presentation.pdf`.

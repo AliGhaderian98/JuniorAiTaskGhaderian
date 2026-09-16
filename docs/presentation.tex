@@ -20,6 +20,7 @@
 \setbeamercolor{itemize item}{fg=accent}
 \setbeamertemplate{itemize item}{\small$\bullet$}
 \setbeamertemplate{itemize subitem}{\scriptsize$-$}
+\setbeamerfont{itemize/enumerate subbody}{size=\scriptsize}
 
 \newcommand{\code}[1]{\texttt{#1}}
 
@@ -36,14 +37,14 @@
 % ---------------------------------------------------------------------------
 \begin{frame}{1 \;|\; Architecture \& data flow}
 \centering
-\begin{tikzpicture}[node distance=4mm]
+\begin{tikzpicture}[node distance=3.5mm]
   % offline indexing
   \node[font=\scriptsize\bfseries, text=accent, anchor=west] (t1) at (-0.6,1.6) {Indexing (once: \code{scripts/build\_index.py})};
-  \node[box=19mm] (cdm) at (0.6,0.6) {Microsoft CDM\\ 42 JSON files};
+  \node[box=21mm] (cdm) at (0.6,0.6) {Microsoft CDM\\ 42 JSON files};
   \node[box=21mm, right=of cdm] (parse) {Parser\\ inheritance + manifest relationships};
-  \node[box=19mm, right=of parse] (ent) {27 entities\\ $\rightarrow$ 168 chunks};
-  \node[box=19mm, right=of ent] (emb) {Embeddings\\ bge-small-en-v1.5};
-  \node[box=19mm, right=of emb] (db) {Chroma\\ vectors + metadata};
+  \node[box=21mm, right=of parse] (ent) {27 entities\\ $\rightarrow$ 168 chunks};
+  \node[box=21mm, right=of ent] (emb) {Embeddings\\ \mbox{\tiny bge-small-en-v1.5}\\ local, 384 dim.};
+  \node[box=21mm, right=of emb] (db) {Chroma\\ vectors + metadata};
   \draw[flow] (cdm) -- (parse);
   \draw[flow] (parse) -- (ent);
   \draw[flow] (ent) -- (emb);
@@ -53,11 +54,11 @@
 
   % online query
   \node[font=\scriptsize\bfseries, text=accent, anchor=west] (t2) at (-0.6,-0.85) {Question answering (per request)};
-  \node[box=19mm] (api) at (0.6,-2.5) {FastAPI\\ \code{POST /ask}};
+  \node[box=21mm] (api) at (0.6,-2.5) {FastAPI\\ \code{POST /ask}};
   \node[box=21mm, right=of api] (ret) {Retriever\\ name match + top-5, score $\ge$ 0.63};
-  \node[box=19mm, right=of ret] (ctx) {Numbered context\\ + source paths};
-  \node[box=19mm, right=of ctx] (llm) {OpenAI\\ gpt-4.1-mini, temp.~0};
-  \node[box=19mm, right=of llm] (ans) {Answer\\ + \code{[n]} citations + sources};
+  \node[box=21mm, right=of ret] (ctx) {Numbered context\\ + source paths};
+  \node[box=21mm, right=of ctx] (llm) {OpenAI\\ \mbox{\tiny gpt-4.1-mini}\\ temperature 0};
+  \node[box=21mm, right=of llm] (ans) {Answer\\ + \code{[n]} citations + sources};
   \draw[flow] (api) -- (ret);
   \draw[flow] (ret) -- (ctx);
   \draw[flow] (ctx) -- (llm);

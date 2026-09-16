@@ -347,5 +347,5 @@ report are accurate; slides ≤ 3; no secrets in Git.
 | `scripts/query_index.py` for retrieval-only checks | Not built. Replaced by `POST /retrieve` and `scripts/evaluate_retrieval.py` |
 | OpenAI default model chosen later | `gpt-4.1-mini` (compared with `gpt-5.4-mini`, see README §12) |
 | Tests: parser, retrieval, small API test, optional marked integration test | Parser, documents, vector store, retrieval, RAG service, API, real-data checks (`tests/test_real_cdm_data.py`); no pytest marker, the real-index check is `scripts/evaluate_retrieval.py` |
-| LaTeX: install MiKTeX/TeX Live or compile in Docker | Decision: only the `.tex` source is delivered (`docs/presentation.tex`). Not compiled; static checks only. See `docs/VALIDATION_REPORT.md` |
+| LaTeX: install MiKTeX/TeX Live or compile in Docker | Compiled with the TeX Live Docker image (`texlive/texlive:latest-medium`) to `docs/presentation.pdf`, 3 pages, visually checked. See `docs/VALIDATION_REPORT.md` |
 | — | Added: `requirements-dev.txt`, `.gitattributes` (LF), `.dockerignore`, `HF_HUB_OFFLINE=1` in the Docker image |

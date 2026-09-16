@@ -268,8 +268,6 @@ tracing; caching of frequent questions; CI/CD running tests and the retrieval ev
 
 - `docs/IMPLEMENTATION_PLAN.md`: plan and measurements behind the decisions
 - `docs/VALIDATION_REPORT.md`: what was run and the results
-- `docs/presentation.tex`: 3-slide technical walkthrough (Beamer).
-  Compile: `cd docs && pdflatex presentation.tex` (run twice)
-
-The presentation is delivered as LaTeX source; it was not compiled in the
-development environment (no LaTeX installation), see the validation report.
+- `docs/presentation.pdf`: 3-slide technical walkthrough, built from `docs/presentation.tex` (Beamer).
+  Rebuild: `cd docs && pdflatex presentation.tex` (run twice), or without a local LaTeX installation:
+  `docker run --rm -v "$PWD/docs:/build" -w /build texlive/texlive:latest-medium pdflatex presentation.tex`
