@@ -1,0 +1,7 @@
+{
+  "manifestName": "parent",
+  "relationships": [
+    {"fromEntity": "banking/Account.cdm.json/Account", "fromEntityAttribute": "enrollmentBranchId",
+     "toEntity": "banking/Branch.cdm.json/Branch", "toEntityAttribute": "branchId"}
+  ]
+}

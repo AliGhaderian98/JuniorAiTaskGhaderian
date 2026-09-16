@@ -101,12 +101,13 @@ def test_file_without_entity_definition_raises(tmp_path):
 
 # --- relationships -------------------------------------------------------------
 
-def test_manifest_relationships_keep_only_indexed_sources_and_remove_duplicates():
+def test_manifest_relationships_keep_only_indexed_source_entities():
     relationships = parse_manifest_relationships(FIXTURES, MANIFEST, set(ENTITY_FILES))
     as_tuples = [(r.from_entity, r.from_attribute, r.to_entity, r.to_attribute) for r in relationships]
     assert as_tuples == [
         ("Account", "enrollmentBranchId", "Branch", "branchId"),
-        ("Account", "createdBy", "User", "systemUserId"),  # duplicate User path collapsed
+        ("Account", "createdBy", "User", "systemUserId"),
+        ("Account", "createdBy", "User", "systemUserId"),  # second User file; removed later
     ]
     # Email is not an indexed entity, so its relationship to Account is dropped
 
@@ -115,7 +116,7 @@ def test_load_entities_attaches_outgoing_and_incoming_relationships():
     entities = {e.name: e for e in load_entities(FIXTURES, ENTITY_FILES, [MANIFEST])}
 
     account, branch = entities["Account"], entities["Branch"]
-    assert [r.to_entity for r in account.relationships] == ["Branch", "User"]
+    assert [r.to_entity for r in account.relationships] == ["Branch", "User"]  # duplicate removed
     assert account.referenced_by == []
     assert [(r.from_entity, r.from_attribute) for r in branch.referenced_by] == [
         ("Account", "enrollmentBranchId")
@@ -126,3 +127,11 @@ def test_load_entities_attaches_outgoing_and_incoming_relationships():
 def test_duplicate_entity_names_are_rejected():
     with pytest.raises(ValueError, match="unique"):
         load_entities(FIXTURES, ["banking/Branch.cdm.json", "banking/Branch.cdm.json"], [MANIFEST])
+
+
+def test_relationship_listed_in_two_manifests_is_attached_once():
+    # The real applicationCommon manifest repeats relationships of the banking sub-manifest.
+    manifests = [MANIFEST, "parent.manifest.cdm.json"]
+    entities = {e.name: e for e in load_entities(FIXTURES, ENTITY_FILES, manifests)}
+    assert [r.from_attribute for r in entities["Account"].relationships] == ["enrollmentBranchId", "createdBy"]
+    assert len(entities["Branch"].referenced_by) == 1

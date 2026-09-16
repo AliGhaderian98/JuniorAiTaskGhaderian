@@ -8,6 +8,7 @@ import pytest
 
 from app.cdm_parser import load_cdm_entities
 from app.config import CDM_DATA_DIR
+from app.documents import build_chunks
 
 
 @pytest.fixture(scope="module")
@@ -38,3 +39,8 @@ def test_contact_relates_to_account(entities):
 def test_no_direct_contact_organization_relationship(entities):
     assert all(r.to_entity != "Organization" for r in entities["Contact"].relationships)
     assert all(r.from_entity != "Contact" for r in entities["Organization"].referenced_by)
+
+
+def test_chunk_ids_are_unique_for_real_data(entities):
+    chunks = build_chunks(list(entities.values()))
+    assert len({c.id for c in chunks}) == len(chunks)

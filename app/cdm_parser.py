@@ -122,24 +122,21 @@ def parse_manifest_relationships(
     """Read explicit relationships from a manifest.
 
     Only relationships that start at an indexed entity file are kept.
-    Duplicates (same names, different target file) are removed.
+    Manifest paths are relative to the manifest's own folder.
     """
     manifest = load_json(data_dir, manifest_path)
     manifest_dir = posixpath.dirname(manifest_path)
 
     relationships = []
-    seen = set()
     for item in manifest.get("relationships", []):
         from_file, from_entity = item["fromEntity"].rsplit("/", 1)
         if posixpath.join(manifest_dir, from_file) not in entity_paths:
             continue
-        key = (from_entity, item["fromEntityAttribute"],
-               item["toEntity"].rsplit("/", 1)[1], item["toEntityAttribute"])
-        if key in seen:
-            continue
-        seen.add(key)
         relationships.append(Relationship(
-            from_entity=key[0], from_attribute=key[1], to_entity=key[2], to_attribute=key[3]
+            from_entity=from_entity,
+            from_attribute=item["fromEntityAttribute"],
+            to_entity=item["toEntity"].rsplit("/", 1)[1],
+            to_attribute=item["toEntityAttribute"],
         ))
     return relationships
 
@@ -151,8 +148,16 @@ def load_entities(data_dir: Path, entity_paths: list[str], manifest_paths: list[
     if len(by_name) != len(entities):
         raise ValueError("Entity names must be unique within the indexed scope")
 
+    # The same relationship can appear twice: in two manifests, or with two
+    # different target files that have the same entity name (e.g. two "User" files).
+    seen = set()
     for manifest_path in manifest_paths:
         for relationship in parse_manifest_relationships(data_dir, manifest_path, set(entity_paths)):
+            key = (relationship.from_entity, relationship.from_attribute,
+                   relationship.to_entity, relationship.to_attribute)
+            if key in seen:
+                continue
+            seen.add(key)
             by_name[relationship.from_entity].relationships.append(relationship)
             if relationship.to_entity in by_name:
                 by_name[relationship.to_entity].referenced_by.append(relationship)
