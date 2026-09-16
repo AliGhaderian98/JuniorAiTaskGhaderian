@@ -1,7 +1,9 @@
 # Implementation Plan: CDM RAG API
 
-Status: Phase 2 done. Scope is fixed from the real repository contents (§3, §6, §8
-updated).
+Status: implemented. This plan was written before and during implementation.
+§3 (scope) and §9 (retrieval) contain the final, measured decisions. Where other
+sections differ from the code, **§17 "Differences from the final implementation"**
+is authoritative.
 
 ## 1. Project goal
 
@@ -21,7 +23,7 @@ guessing.
 | uv / pip | uv 0.11.16, pip 26.1.1. Poetry is not installed. |
 | Docker | 29.4.3. Daemon is running. |
 | GitHub CLI (`gh`) | **Not installed.** Pushing uses plain `git`. |
-| LaTeX (pdflatex/xelatex/latexmk) | **Not installed.** PDF compilation is currently NOT possible locally (see §11). |
+| LaTeX (pdflatex/xelatex/latexmk) | **Not installed.** PDF compilation is currently NOT possible locally (see §13 and §17). |
 | `OPENAI_API_KEY` | Set in the environment. The value was not printed. |
 
 ## 3. Assumptions and scope
@@ -279,8 +281,8 @@ The prompt still decides whether it answers the question.
 
 ## 12. Demo strategy
 
-Swagger UI (`/docs`) plus curl. `docs/DEMO_SCRIPT.md` will contain 4–5
-questions, **each confirmed against the indexed data**: Account attributes, one
+Swagger UI (`/docs`) plus curl, using 4–5 questions,
+**each confirmed against the indexed data**: Account attributes, one
 real relationship, one semantic question (e.g. "Which entity stores a
 customer's loans and savings?"), and one off-topic question for abstention.
 Backup if OpenAI is down: `/ask` returns `retrieved_entities` and `sources`
@@ -290,15 +292,10 @@ anyway, so retrieval can still be shown. There will also be a
 ## 13. Documentation strategy
 
 - `README.md`: the 16 sections requested. Short and factual.
-- `docs/DEMO_SCRIPT.md`, `docs/VALIDATION_REPORT.md` (PASS / FAIL / NOT VERIFIED
-  with commands).
-- `docs/presentation.tex` (≤ 3 Beamer slides) and `docs/learning_guide.tex`
-  (Persian, XeLaTeX).
+- `docs/VALIDATION_REPORT.md` (PASS / FAIL / NOT VERIFIED with commands).
+- `docs/presentation.tex` (≤ 3 Beamer slides).
 - **LaTeX is not installed.** Options: (a) you install MiKTeX / TeX Live, or
   (b) compile inside a Docker TeX image (e.g. `texlive/texlive`, several GB).
-  Persian needs XeLaTeX + a free Unicode font such as Vazirmatn (OFL) or
-  bidi-capable fonts shipped with TeX Live. No proprietary fonts are
-  redistributed.
 
 ## 14. Planned structure
 
@@ -308,7 +305,7 @@ app/ __init__.py main.py config.py models.py cdm_loader.py cdm_parser.py
 scripts/ build_index.py query_index.py
 data/cdm/            (pinned raw JSON, committed)
 tests/ test_cdm_parser.py test_retrieval.py test_api.py fixtures/
-docs/  IMPLEMENTATION_PLAN.md DEMO_SCRIPT.md VALIDATION_REPORT.md presentation.tex learning_guide.tex
+docs/  IMPLEMENTATION_PLAN.md VALIDATION_REPORT.md presentation.tex
 Dockerfile .dockerignore .env.example .gitignore README.md requirements.txt
 ```
 
@@ -329,13 +326,26 @@ The checklist in the task prompt (§25) is the acceptance criteria. In short:
 real CDM data is ingested with scope documented; attributes and relationships
 are parsed and covered by tests; retrieval works for attribute, relationship,
 and semantic questions; off-topic questions abstain; `/health` and `/ask` work
-locally and in Docker; all unit tests pass; README / demo script / validation
-report are accurate; slides ≤ 3; Persian learning guide matches the final code;
-no secrets in Git.
+locally and in Docker; all unit tests pass; README / validation
+report are accurate; slides ≤ 3; no secrets in Git.
 
 ## 16. Phases
 
 1 plan (this) → 2 inspect CDM + fix scope → 3 models + parser → 4 chunk docs →
 5 embeddings + Chroma → 6 retriever + threshold calibration → 7 RAG service →
 8 FastAPI → 9 tests/edge cases → 10 Docker + README → 11 end-to-end validation →
-12 slides → 13 learning guide → 14 final audit + commits.
+12 slides → 13 final audit + commits.
+
+## 17. Differences from the final implementation
+
+| Plan said | Final implementation |
+|---|---|
+| `EntityDocument(entity_name, model, extends, ...)` | `app/models.py`: `Entity(name, description, source_path, inheritance_chain, attributes, relationships, referenced_by)`, `Attribute(name, data_type, description, source_path)` |
+| `Relationship(source_entity, attribute_name, target_entity, ...)` | `Relationship(from_entity, from_attribute, to_entity, to_attribute)` |
+| Chunk text built in `cdm_parser.py`; attribute groups of ~20 only when needed | Separate `app/documents.py` with three chunk types: `overview`, `referenced_by`, `attributes` (always 12 per chunk). Measured: one chunk per entity reached 700 tokens (limit 512); largest chunk now 416 |
+| `embeddings.py` might be merged into `vector_store.py` | Kept separate (lazy import of sentence-transformers keeps tests fast) |
+| `scripts/query_index.py` for retrieval-only checks | Not built. Replaced by `POST /retrieve` and `scripts/evaluate_retrieval.py` |
+| OpenAI default model chosen later | `gpt-4.1-mini` (compared with `gpt-5.4-mini`, see README §12) |
+| Tests: parser, retrieval, small API test, optional marked integration test | Parser, documents, vector store, retrieval, RAG service, API, real-data checks (`tests/test_real_cdm_data.py`); no pytest marker, the real-index check is `scripts/evaluate_retrieval.py` |
+| LaTeX: install MiKTeX/TeX Live or compile in Docker | Decision: only the `.tex` source is delivered (`docs/presentation.tex`). Not compiled; static checks only. See `docs/VALIDATION_REPORT.md` |
+| — | Added: `requirements-dev.txt`, `.gitattributes` (LF), `.dockerignore`, `HF_HUB_OFFLINE=1` in the Docker image |

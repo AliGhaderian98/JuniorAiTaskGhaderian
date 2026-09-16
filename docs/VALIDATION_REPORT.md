@@ -1,7 +1,7 @@
 # Validation Report
 
 Date: 2026-09-16. Machine: Windows 11, Python 3.12.10, Docker 29.4.3.
-Code state: commit `fb42df9` plus README wording changes (no code changes), unless noted.
+Code state: application code unchanged since commit `d32bc4e` (later commits only changed documentation), unless noted.
 Every row was actually run; results are copied from the command output.
 
 ## Summary
@@ -31,8 +31,7 @@ Every row was actually run; results are copied from the command output.
 | 21 | Docker run + requests inside container | PASS |
 | 22 | Docker without network | PASS |
 | 23 | Secrets / ignored files | PASS |
-| 24 | LaTeX presentation compilation | NOT VERIFIED (Phase 12 pending) |
-| 25 | LaTeX learning guide compilation | NOT VERIFIED (Phase 13 pending) |
+| 24 | LaTeX presentation compilation | NOT VERIFIED (source only, static checks PASS) |
 
 ## Details
 
@@ -49,7 +48,7 @@ No linter is configured in the project; ruff was run as an extra check without a
 uvx ruff@latest check --isolated app scripts tests      # ruff 0.16.7
 All checks passed!
 ```
-First run found 13 fixable issues (import formatting, unused `noqa` comments); fixed with `--fix` in commit `fb42df9`, tests re-run afterwards.
+First run found 13 fixable issues (import formatting, unused `noqa` comments); fixed with `--fix` in commit `d32bc4e`, tests re-run afterwards.
 
 ### 3. Fresh clone — PASS (after fix)
 First attempt, cloning into a very deep folder:
@@ -57,7 +56,7 @@ First attempt, cloning into a very deep folder:
 git clone <repo> <long scratch path>\fresh_clone
 fatal: cannot create directory at 'data/cdm/core/.../banking': Filename too long
 ```
-Fix: documented in README §5. Second attempt (commit `07aea15`):
+Fix: documented in README §5. Second attempt (commit `9a77196`):
 ```
 git clone -c core.longpaths=true <repo> %TEMP%\cdmfresh
 py -3.12 -m venv .venv && pip install -r requirements-dev.txt   -> pip install OK
@@ -147,7 +146,7 @@ docker exec <container> whoami                      -> appuser
 ```
 
 ### 22. Docker without network — PASS
-Tested on the image built from commit `07aea15` (same runtime code as `fb42df9`, which only
+Tested on the image built from commit `9a77196` (same runtime code as `d32bc4e`, which only
 changed formatting in scripts/tests and the README).
 ```
 docker run -d --rm --network none -e OPENAI_API_KEY cdm-rag-api
@@ -161,10 +160,23 @@ docker run -d --rm --network none -e OPENAI_API_KEY cdm-rag-api
 ```
 git ls-files | grep -v ^data/cdm/ | xargs grep -nIE "sk-[A-Za-z0-9_-]{20,}|OPENAI_API_KEY\s*=\s*\S+"
 ```
-Only placeholders (`sk-...`) in README/DEMO_SCRIPT, a comment in the Dockerfile and
+Only placeholders (`sk-...`) in the README, a comment in the Dockerfile and
 `os.getenv("OPENAI_API_KEY")` in `app/config.py`. No key-like strings in `data/cdm`.
 `git check-ignore`: `.env`, `chroma_db/`, `.venv/` are ignored; none are tracked.
 `.dockerignore` excludes `.env`, `.venv`, `chroma_db`.
 
-### 24–25. LaTeX — NOT VERIFIED
-`pdflatex`, `xelatex` and `latexmk` are not installed on this machine. To be updated in Phases 12–13.
+### 24. LaTeX presentation — NOT VERIFIED
+`pdflatex`, `xelatex` and `latexmk` are not installed on this machine, and by decision only the
+`.tex` source is delivered. No PDF exists, so page count and overflowing text were **not** checked.
+
+Command to compile (from `docs/`):
+```
+pdflatex presentation.tex && pdflatex presentation.tex        # expect 3 pages
+```
+
+What was checked instead (a script, not a LaTeX run):
+```
+python check_tex.py presentation.tex
+frames: 3 | environments balanced: True | braces balanced: True
+possibly unescaped _ : [] | unescaped & : [] | unescaped # : []
+```

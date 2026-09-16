@@ -206,7 +206,7 @@ used to keep the image smaller. The API key is only passed at runtime.
 | BGE query instruction | Model-card recommendation; measured better separation of in-scope vs. off-topic scores |
 | Chroma | Stores vectors, text and metadata together; filter by metadata; persistent on disk. FAISS would need a separate metadata store |
 | Relationships from manifests | Explicit (`fromEntity`, `fromEntityAttribute`, `toEntity`, `toEntityAttribute`) and include inherited relationships |
-| No LangChain | The pipeline is ~300 lines of plain Python, easier to test and explain |
+| No LangChain | The app is ~800 lines of plain Python (`app/`), easier to test and explain |
 | `gpt-4.1-mini`, temperature 0 | Compared with `gpt-5.4-mini` on the demo questions: both stayed grounded, but `gpt-5.4-mini` refused to list Account attributes that were in the context |
 
 ## 13. Relationship handling
@@ -267,5 +267,9 @@ tracing; caching of frequent questions; CI/CD running tests and the retrieval ev
 ## More documentation
 
 - `docs/IMPLEMENTATION_PLAN.md`: plan and measurements behind the decisions
-- `docs/DEMO_SCRIPT.md`: live demo steps
 - `docs/VALIDATION_REPORT.md`: what was run and the results
+- `docs/presentation.tex`: 3-slide technical walkthrough (Beamer).
+  Compile: `cd docs && pdflatex presentation.tex` (run twice)
+
+The presentation is delivered as LaTeX source; it was not compiled in the
+development environment (no LaTeX installation), see the validation report.
