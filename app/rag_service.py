@@ -32,6 +32,8 @@ Rules:
 
 
 class Source(BaseModel):
+    number: int  # matches the [n] citations in the answer
+    chunk_id: str
     entity_name: str
     chunk_type: str
     source_path: str
@@ -61,9 +63,9 @@ def build_context(results: list[RetrievedChunk]) -> str:
 
 def build_sources(results: list[RetrievedChunk]) -> list[Source]:
     return [
-        Source(entity_name=r.chunk.entity_name, chunk_type=r.chunk.chunk_type,
+        Source(number=number, chunk_id=r.chunk.id, entity_name=r.chunk.entity_name, chunk_type=r.chunk.chunk_type,
                source_path=r.chunk.source_path, match=r.match, score=r.score)
-        for r in results
+        for number, r in enumerate(results, start=1)
     ]
 
 

@@ -81,10 +81,10 @@ def test_response_contains_answer_sources_and_unique_entities():
 
     assert response.answer == "Contact links to Account via parentCustomerId [1]."
     assert response.retrieved_entities == ["Contact", "Account"]
-    assert [(s.entity_name, s.chunk_type, s.match, s.score) for s in response.sources] == [
-        ("Contact", "overview", "entity_name", None),
-        ("Account", "overview", "entity_name", None),
-        ("Contact", "attributes", "semantic", 0.71),
+    assert [(s.number, s.chunk_id, s.match, s.score) for s in response.sources] == [
+        (1, "Contact:overview", "entity_name", None),
+        (2, "Account:overview", "entity_name", None),
+        (3, "Contact:attributes", "semantic", 0.71),
     ]
 
 

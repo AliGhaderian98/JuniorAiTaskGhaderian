@@ -1,0 +1,11 @@
+# Runtime dependencies (Python 3.12).
+# CPU-only PyTorch wheels: avoids downloading ~2 GB of CUDA libraries.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.14.0+cpu
+
+fastapi==0.141.1
+uvicorn==0.53.0
+pydantic==2.13.5
+sentence-transformers==6.0.1
+chromadb==1.5.9
+openai==3.14.1

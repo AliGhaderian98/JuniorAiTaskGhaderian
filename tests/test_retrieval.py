@@ -52,12 +52,16 @@ CHUNKS = [
 ]
 
 
-@pytest.fixture
-def retriever():
+def make_retriever(min_score):
     collection = new_collection()
     embedder = FakeEmbedder()
     add_chunks(collection, CHUNKS, embedder.embed_documents([c.text for c in CHUNKS]))
-    return Retriever(collection, embedder, top_k=3, min_score=0.6)
+    return Retriever(collection, embedder, top_k=3, min_score=min_score)
+
+
+@pytest.fixture
+def retriever():
+    return make_retriever(min_score=0.6)
 
 
 def ids(results):
@@ -101,10 +105,14 @@ def test_off_topic_question_returns_no_context(retriever):
     assert retriever.retrieve("What will the weather be like tomorrow?") == []
 
 
-def test_semantic_results_below_min_score_are_dropped(retriever):
-    results = retriever.retrieve("weather at the branch")  # weak overlap with Branch only
-    assert all(r.score is None or r.score >= 0.6 for r in results)
-    assert "Account:overview" not in ids(results)
+def test_min_score_decides_whether_a_weak_semantic_match_is_kept():
+    # "bank loan" names no indexed entity. With the fake embedder its best match,
+    # FinancialProduct:overview (words "loan", "customer"), has cosine score 0.5.
+    assert make_retriever(min_score=0.6).retrieve("bank loan") == []
+
+    results = make_retriever(min_score=0.4).retrieve("bank loan")
+    assert ids(results)[0] == "FinancialProduct:overview"
+    assert results[0].score == pytest.approx(0.5, abs=1e-3)
 
 
 def test_at_most_three_named_entities_are_expanded(retriever):
@@ -116,3 +124,9 @@ def test_at_most_three_named_entities_are_expanded(retriever):
 def test_empty_question_is_rejected(retriever):
     with pytest.raises(ValueError):
         retriever.retrieve("   ")
+
+
+def test_matches_acronym_and_name_with_digits():
+    names = ["KYC", "Company360", "Customer360Person"]
+    assert find_entity_names("What does the kyc entity store?", names) == ["KYC"]
+    assert find_entity_names("Explain company 360 and Customer360Person", names) == ["Company360", "Customer360Person"]
