@@ -266,7 +266,7 @@ tracing; caching of frequent questions; CI/CD running tests and the retrieval ev
 
 ## More documentation
 
-- `docs/IMPLEMENTATION_PLAN.md`: plan and measurements behind the decisions
+- `docs/IMPLEMENTATION_PLAN.md`: design decisions, trade-offs and limitations
 - `docs/VALIDATION_REPORT.md`: what was run and the results
 - `docs/presentation.pdf`: 3-slide technical walkthrough, built from `docs/presentation.tex` (Beamer).
   Rebuild: `cd docs && pdflatex presentation.tex` (run twice), or without a local LaTeX installation:
